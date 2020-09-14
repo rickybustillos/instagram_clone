@@ -1,8 +1,10 @@
 // Carregar módulos do express, body-parser e do mongodb
 var express = require('express'),
     bodyParser = require('body-parser'),
-    mongodb = require('mongodb');
-    objectId = require('mongodb').ObjectId;
+    multiparty = require('connect-multiparty'),
+    mongodb = require('mongodb'),
+    objectId = require('mongodb').ObjectId,
+    fs = require('fs');
 
 // Instanciar o express
 var app = express();
@@ -10,6 +12,7 @@ var app = express();
 // Instanciar o middleware body-parser
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(multiparty());
 
 // Configurar porta
 var port = 8080;
@@ -33,21 +36,53 @@ app.get('/', function(req, res) {
 // POST (create)
 app.post('/api', function(req, res) {
 
+    // aplicação cross-domain, responde a qualquer domínio
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    var date = new Date();
+    time_stamp = date.getTime();
+
     // Recebendo dados enviados via POST
     var dados = req.body;
 
-    db.open(function(err, mongoclient) {
-        mongoclient.collection('postagens', function(err, collection) {
-            collection.insert(dados, function(err, records) {
+    res.send(dados);
 
-                if (err) {
-                    res.json(err);
-                } else {
-                    res.json(records);
-                }
-                mongoclient.close();
-            });
-        })
+    console.log(req.files);
+
+    var url_imagem = time_stamp + '_' + req.files.arquivo.originalFilename;
+
+    var path_origem = req.files.arquivo.path;
+    var path_destino = './uploads/' + url_imagem;
+    
+
+    var readS = fs.createReadStream(path_origem);
+    var writeS = fs.createWriteStream(path_destino);
+    readS.pipe(writeS);
+
+    readS.on("end", function(err) {
+        if(err){
+        res.status(500).json({ error : err });
+        return;
+        }
+        
+        var dados = {
+            url_imagem: url_imagem,
+            titulo: req.body.titulo
+        }
+        
+        db.open(function(err, mongoclient) {
+            mongoclient.collection('postagens', function(err, collection) {
+                collection.insert(dados, function(err, records) {
+
+                    if (err) {
+                        res.json(err);
+                    } else {
+                        res.json(records);
+                    }
+                    mongoclient.close();
+                });
+            })
+        });
     });
 
 });
@@ -93,12 +128,9 @@ app.get('/api/:id', function(req, res) {
 app.put('/api/:id', function(req, res) {
     db.open(function(err, mongoclient) {
         mongoclient.collection('postagens', function(err, collection) {
-            collection.update(
-                { _id: objectId(req.params.id) },
-                { $set: { titulo : req.body.titulo }},
-                {},
-                function (err,records) {  
-                    if(err){
+            collection.update({ _id: objectId(req.params.id) }, { $set: { titulo: req.body.titulo } }, {},
+                function(err, records) {
+                    if (err) {
                         res.json(err);
                     } else {
                         res.json(records);
@@ -115,8 +147,8 @@ app.put('/api/:id', function(req, res) {
 app.delete('/api/:id', function(req, res) {
     db.open(function(err, mongoclient) {
         mongoclient.collection('postagens', function(err, collection) {
-            collection.remove({ _id : objectId(req.params.id)}, function(err, records){
-                if(err){
+            collection.remove({ _id: objectId(req.params.id) }, function(err, records) {
+                if (err) {
                     res.json(err);
                 } else {
                     res.json(records);
