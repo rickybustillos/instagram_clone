@@ -52,12 +52,27 @@ app.post('/api', function(req, res) {
 
 });
 
+
+// GET (read)
+app.get('/api', function(req, res) {
+    db.open(function(err, mongoclient) {
+        mongoclient.collection('postagens', function(err, collection) {
+            collection.find().toArray(function(err, results) {
+                if (err) {
+                    res.json(err);
+                } else {
+                    res.json(results);
+                }
+                mongoclient.close();
+            });
+        });
+    });
+
+});
+
+
 // GET by ID (read)
 app.get('/api/:id', function(req, res) {
-
-    // Recebendo dados enviados via POST
-    var dados = req.body;
-
     db.open(function(err, mongoclient) {
         mongoclient.collection('postagens', function(err, collection) {
             collection.find(objectId(req.params.id)).toArray(function(err, results) {
@@ -71,4 +86,43 @@ app.get('/api/:id', function(req, res) {
         });
     });
 
+});
+
+
+// PUT by ID (update)
+app.put('/api/:id', function(req, res) {
+    db.open(function(err, mongoclient) {
+        mongoclient.collection('postagens', function(err, collection) {
+            collection.update(
+                { _id: objectId(req.params.id) },
+                { $set: { titulo : req.body.titulo }},
+                {},
+                function (err,records) {  
+                    if(err){
+                        res.json(err);
+                    } else {
+                        res.json(records);
+                    }
+                    mongoclient.close();
+                }
+            );
+        });
+    });
+
+});
+
+// DELETE by ID (remover)
+app.delete('/api/:id', function(req, res) {
+    db.open(function(err, mongoclient) {
+        mongoclient.collection('postagens', function(err, collection) {
+            collection.remove({ _id : objectId(req.params.id)}, function(err, records){
+                if(err){
+                    res.json(err);
+                } else {
+                    res.json(records);
+                }
+                mongoclient.close();
+            });
+        });
+    });
 });
