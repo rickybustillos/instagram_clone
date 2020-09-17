@@ -2,13 +2,12 @@ body{
 	background: #FAFAFA;
 }
 
-.img-center {
-	margin:0 auto;
+* {
+	border-color: #e0e0e0 !important;
 }
 
-.btn-primary{
-	background-color: #3897f0;
-	border-color: #3897f0;
+.img-center {
+	margin:0 auto;
 }
 
 .btn-login{
@@ -16,24 +15,15 @@ body{
 	font-weight: bold;
 }
 
-.painel-login{
-	padding-top: 60px;
-}
-
-.home{
-	padding-top: 30px;
-}
-
 .navbar-default{
 	background: #fff;
+}
+.navbar-default img {
+	height: 40px;
 }
 
 .logo2{
 	padding-left:50px;
-}
-
-.btn-incluir{
-	padding-top: 25px;
 }
 
 #div_incluir{
@@ -49,41 +39,39 @@ body{
 }
 
 .publicacao{
-	border:solid 1px #EFEFEF;
-	margin-bottom:50px;
+	border:solid 1px;
 	text-align: center;
+	border-radius: 5px;
 }
 
 .publicacao .titulo{
-	background-color: #FFF;
-	padding-left:30px;
-	padding-top:15px;
-	padding-bottom:15px;
 	display:block;
-	font-weight: bold;
 	text-align: left;
 }
 
-.publicacao img{
-	border-top:solid 1px #EFEFEF;
-	border-bottom:solid 1px #EFEFEF;
-}
 
 .comentar{
 	text-align: left;
-	padding:20px;
-	background:#FFF;
 }
 
 .input_comentario{
+	outline: none !important;
+	outline-style: none !important;
+	box-shadow: none !important;
+	border-color: transparent !important;
 	border: none;
 	box-shadow: none;
-	margin-bottom:10px;
+}
+.btn-link {
+	border: none;
+}
+.btn-link:hover {
+	border: none;
+	text-decoration: none;
 }
 
 .comentarios{
 	text-align: left;
-	padding:20px;
 	background:#FFF;
 	border-bottom: solid 1px #EFEFEF;
 }

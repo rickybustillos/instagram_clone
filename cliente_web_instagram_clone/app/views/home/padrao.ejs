@@ -9,13 +9,69 @@
 		<script src="http://code.jquery.com/jquery-3.1.1.min.js"></script>
 
 		<!-- bootstrap - link cdn -->
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 	
 		<!-- incluindo css -->
 		<link href="css/style.css" rel="stylesheet">
 
 		<script>
 			$(document).ready(function(){
+				
+				function carrega_postagens(){
+
+					// criar xmlhttprequest
+					var xhr = new XMLHttpRequest();
+					xhr.open('GET', 'http://localhost:8080/api');
+
+					// verificar as mudanças de estado
+					xhr.onload = function(){
+						if(xhr.status === 200){
+							// parseJSON recebe string em construção JSON para um objeto JSON
+							var data = $.parseJSON(xhr.responseText);
+							
+							for(var i = 0; i < data.length; i++){
+
+								$('#container_timeline').append(
+									'<div class="publicacao my-4 bg-white">' +
+										'<div class="row">' +
+											'<div class="col px-4 mx-3 my-3 text-left">' +
+												'<h6 class="font-weight-bold">pessoa</h6>' +
+											'</div>' +
+										'</div>' +
+										'<div class="row">' +
+											'<div class="col">' +
+												'<img class="img-center img-fluid w-100" src="http://localhost:8080/imagens/' + data[i].url_imagem + '">' +								 
+											'</div>' +
+										'</div>' +
+										'<div class="row px-4 my-2">' +
+											'<div class="col my-0 py-0">' +
+												'<p class="titulo font-weight-normal">' + 
+													'<span class="font-weight-bold">pessoa </span>' +
+													data[i].descricao + 
+												'</p>' + 
+											'</div>' +
+										'</div>' +
+										'<div class="comentar row px-4 my-2">' +
+											'<div class="col-sm-8">' +
+												'<input type="text" class="form-control px-0 input_comentario" id="'+data[i]._id+'" placeholder="Adicione um comentário...">' +
+											'</div>' +
+											'<div class="col-sm-4 text-right">' +
+												'<button class="btn btn-link btn_postagem btn-sm font-weight-bold" value="'+data[i]._id+'" type="button">Publicar</button>' +
+											'</div>' +
+										'</div>' +
+									'</div>'					
+								);
+
+							}
+
+						}
+					}
+
+					xhr.send();
+
+				}
+
+				carrega_postagens();
 
 				$('#btn_incluir').click(function(){
 					$('#container_timeline').hide();
@@ -34,10 +90,10 @@
 					var formData = new FormData();
 
 					var arquivo = document.getElementById('arquivo').files[0];
-					var titulo = document.getElementById('titulo').value;
+					var descricao = document.getElementById('descricao').value;
 
 					formData.append('arquivo', arquivo);
-					formData.append('titulo', titulo);
+					formData.append('descricao', descricao);
 
 					// criar xmlhttprequest
 					var xhr = new XMLHttpRequest();
@@ -64,21 +120,29 @@
 
 	<body>
 
-		<nav class="navbar navbar-default">
-			<div class="container">
-				<div class="col-md-12">
-					<div class="container-fluid">
-						<img alt="Instagram Clone - Versão WEB" src="images/logo2.jpg" class="logo2">
-						<img alt="Incluir" src="images/incluir.jpg" class="pull-right btn-incluir" id="btn_incluir">						
-					</div>
+		<nav class="navbar navbar-default py-0 my-0 border-bottom">
+			<div class="container py-2 my-0">
+				<div class="col-md-4 mx-auto">
+					<a class="text-left" href="http://localhost/home">
+						<img alt="Instagram" src="images/logo1.jpg" class="img-fluid ">
+					</a>
+				</div>
+				<div class="col-md-4 mx-auto">
+
+				</div>
+				<div class="col-md-4 mx-auto text-right">
+					<a class="text-right mx-auto" href="#">
+						<img alt="Incluir" src="images/incluir.jpg" class="btn-incluir h-50 img-fluid" id="btn_incluir">						
+					</a>
 				</div>
 			</div>
 		</nav>
 
-		<div class="container">
-			<div class="col-md-2"></div>
-			<div class="col-md-8" id="container_timeline"></div>
-			
+		<div class="container my-0">
+			<div class="row">
+				<div class="col-lg-6 col-md-8 mx-auto" id="container_timeline"></div>
+				<div class="col-md-3 mx-auto"></div>
+			</div>	
 		</div>
 
 
@@ -93,7 +157,7 @@
 				</div>
 
 				<div class="form-group">
-					<input type="text" name="titulo" id="titulo" class="form-control" placeholder="Titulo" autocomplete="off">
+					<input type="text" name="descricao" id="descricao" class="form-control" placeholder="Descrição" autocomplete="off">
 				</div>
 
 				<div class="form-group">

@@ -47,29 +47,26 @@ app.post('/api', function(req, res) {
 
     res.send(dados);
 
-    console.log(req.files);
-
     var url_imagem = time_stamp + '_' + req.files.arquivo.originalFilename;
 
     var path_origem = req.files.arquivo.path;
     var path_destino = './uploads/' + url_imagem;
-    
 
     var readS = fs.createReadStream(path_origem);
     var writeS = fs.createWriteStream(path_destino);
     readS.pipe(writeS);
 
     readS.on("end", function(err) {
-        if(err){
-        res.status(500).json({ error : err });
-        return;
+        if (err) {
+            res.status(500).json({ error: err });
+            return;
         }
-        
+
         var dados = {
             url_imagem: url_imagem,
-            titulo: req.body.titulo
+            descricao: req.body.descricao
         }
-        
+
         db.open(function(err, mongoclient) {
             mongoclient.collection('postagens', function(err, collection) {
                 collection.insert(dados, function(err, records) {
@@ -90,6 +87,10 @@ app.post('/api', function(req, res) {
 
 // GET (read)
 app.get('/api', function(req, res) {
+
+    // aplicação cross-domain, responde a qualquer domínio
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
     db.open(function(err, mongoclient) {
         mongoclient.collection('postagens', function(err, collection) {
             collection.find().toArray(function(err, results) {
@@ -101,6 +102,23 @@ app.get('/api', function(req, res) {
                 mongoclient.close();
             });
         });
+    });
+
+});
+
+app.get('/imagens/:imagem', function(req, res) {
+
+    var img = req.params.imagem;
+
+    fs.readFile('./uploads/' + img, function(err, content) {
+        if (err) {
+            res.status(400).json(err);
+            return;
+        }
+
+        // res.writeHead(200, { 'content-type' : 'image/jpg' });
+        res.end(content);
+
     });
 
 });
