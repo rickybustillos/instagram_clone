@@ -35,7 +35,7 @@
 									'<div class="publicacao my-4 bg-white">' +
 										'<div class="row">' +
 											'<div class="col px-4 mx-3 my-3 text-left">' +
-												'<h6 class="font-weight-bold">pessoa</h6>' +
+												'<h6 class="font-weight-semibold">pessoa</h6>' +
 											'</div>' +
 										'</div>' +
 										'<div class="row">' +
@@ -43,12 +43,16 @@
 												'<img class="img-center img-fluid w-100" src="http://localhost:8080/imagens/' + data[i].url_imagem + '">' +								 
 											'</div>' +
 										'</div>' +
-										'<div class="row px-4 my-2">' +
+										'<div class="row px-4 mt-2">' +
 											'<div class="col my-0 py-0">' +
-												'<p class="titulo font-weight-normal">' + 
-													'<span class="font-weight-bold">pessoa </span>' +
+												'<p class="titulo font-weight-normal py-0 my-0">' + 
+													'<span class="font-weight-semibold">pessoa </span>' +
 													data[i].descricao + 
 												'</p>' + 
+											'</div>' +
+										'</div>' +
+										'<div class="row px-4">' +
+											'<div class="comentarios col my-0 py-0" id="comentarios_'+data[i]._id+'">' +
 											'</div>' +
 										'</div>' +
 										'<div class="comentar row px-4 my-2">' +
@@ -61,13 +65,59 @@
 										'</div>' +
 									'</div>'					
 								);
+									
+								if(data[i].comentarios != undefined){
+									var comentarios = data[i].comentarios;
+
+									for(let j = 0; j < comentarios.length; j++){
+
+										$('#comentarios_'+data[i]._id).append(
+											'<p class="txt-comentario font-weight-normal my-0 py-0">' + 
+												'<span class="font-weight-semibold">pessoa </span>' + 
+												comentarios[j].comentario +
+											'</p>'
+										);
+
+									}
+								}
 
 							}
+
+							$('.input_comentario').keypress(function(e){
+								if(e.wich == 13 || e.keyCode == 13){
+									var id = this.id;
+									enviar_comentario(id);
+								}
+							});
+							
+							$('.btn_postagem').click(function(){
+								var id = this.value;
+								enviar_comentario(id);				
+							});
 
 						}
 					}
 
 					xhr.send();
+
+				}
+
+				function enviar_comentario(id){
+				
+					var comentario = $('#'+id).val();
+
+					var xhr = new XMLHttpRequest();
+					xhr.open('PUT', 'http://localhost:8080/api/'+id);
+					xhr.setRequestHeader('content-type', 'application/json');
+					xhr.send(JSON.stringify( {comentario : comentario} ));
+
+					xhr.onload = function(){
+						if(xhr.status === 200){
+							window.location.href = '/home';
+						}
+					}
+					
+					$('#'+id).val('');
 
 				}
 

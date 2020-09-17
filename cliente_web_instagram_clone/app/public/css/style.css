@@ -73,12 +73,15 @@ body{
 .comentarios{
 	text-align: left;
 	background:#FFF;
-	border-bottom: solid 1px #EFEFEF;
 }
 
 .txt_comentario{
 	display: block;
 	width:100%;
+}
+
+.font-weight-semibold {
+	font-weight: 600;
 }
 
 .btn_remover_postagem{
