@@ -27,7 +27,7 @@
 
 					// criar xmlhttprequest
 					var xhr = new XMLHttpRequest();
-					xhr.open('GET', 'http://localhost:8080/api');
+					xhr.open('GET', 'http://localhost:8080/api/postagens');
 
 					// verificar as mudanças de estado
 					xhr.onload = function(){
@@ -46,7 +46,7 @@
 										'</div>' +
 										'<div class="row">' +
 											'<div class="col">' +
-												'<img class="img-center img-fluid w-100" src="http://localhost:8080/imagens/' + data[i].url_imagem + '">' +								 
+												'<img class="img-center img-fluid w-100" src="http://localhost:8080/api/postagens/imagens/' + data[i].url_imagem + '">' +								 
 											'</div>' +
 										'</div>' +
 										'<div class="row px-4 mt-2">' +
@@ -90,7 +90,7 @@
 														'<div class="modal-dialog modal-dialog-centered" role="document">'+
 															'<div class="modal-content">' +
 																'<div class="modal-body text-center">' +
-																	'<button class="btn btn-block btn_remover_postagem font-weight-semibold" type="button" value="'+comentarios[j].id_comentario +'" data-dismiss="modal">Excluir</button><hr>' +
+																	'<button class="btn btn-block btn_remover_comentario font-weight-semibold" type="button" value="'+comentarios[j].id_comentario +'" data-dismiss="modal">Excluir</button><hr>' +
 																	'<button class="btn btn-block btn-default close font-weight-semibold py-2" type="button" data-dismiss="modal" aria-label="Close">Cancelar</button>' +
 																'</div>' +
 															'</div>' +
@@ -118,11 +118,11 @@
 							});
 
 
-							$('.btn_remover_postagem').click(function(){
+							$('.btn_remover_comentario').click(function(){
 								var id_comentario = this.value;
 								
 								var xhr = new XMLHttpRequest();
-								xhr.open('DELETE', 'http://localhost:8080/api/'+id_comentario);
+								xhr.open('DELETE', 'http://localhost:8080/api/postagens/comentarios/'+id_comentario);
 								
 								xhr.onload = function(){
 									if(xhr.status === 200){
@@ -163,13 +163,14 @@
 					var comentario = $('#'+id).val();
 
 					var xhr = new XMLHttpRequest();
-					xhr.open('PUT', 'http://localhost:8080/api/'+id);
+					xhr.open('PUT', 'http://localhost:8080/api/postagens/comentarios/'+id);
 					xhr.setRequestHeader('Content-Type', 'application/json');
 					
 					xhr.onload = function(){
+						console.log(xhr.responseText);
+						var responseText = JSON.parse(xhr.responseText);
 						if(xhr.status === 200){
-							let responseText = JSON.parse(xhr.responseText);
-							$('#comentarios_'+responseText.id_publicacao).append(
+							$('#comentarios_'+responseText.id_postagem).append(
 								'<div class="row txt-comentario font-weight-normal m-0 p-0" id="div_'+responseText.id_comentario+'">' + 
 									'<div class="col-10 my-0 p-0">' + 
 										'<span class="font-weight-semibold">pessoa </span>' + 
@@ -182,7 +183,7 @@
 											'<div class="modal-dialog modal-dialog-centered" role="document">'+
 												'<div class="modal-content">' +
 													'<div class="modal-body text-center">' +
-														'<button class="btn btn-block btn_remover_postagem font-weight-semibold" type="button" value="'+responseText.id_comentario +'" data-dismiss="modal">Excluir</button><hr>' +
+														'<button class="btn btn-block btn_remover_comentario font-weight-semibold" type="button" value="'+responseText.id_comentario +'" data-dismiss="modal">Excluir</button><hr>' +
 														'<button class="btn btn-block btn-default close font-weight-semibold py-2" type="button" data-dismiss="modal" aria-label="Close">Cancelar</button>' +
 													'</div>' +
 												'</div>' +
@@ -193,7 +194,7 @@
 							);
 						}
 						if(xhr.status === 400){
-							$('#'+id).val(xhr.responseText.msg);
+							$('#'+id).attr('placeholder', responseText.msg);
 						}
 					}
 					
@@ -233,16 +234,15 @@
 					// verificar as mudanças de estado
 					xhr.onreadystatechange = function(){
 						if(xhr.readyState == 4){
-							var resposta = xhr.responseText;
-							document.getElementById('mensagem').innerHTML = resposta;
+							window.location.href = '/home';
 						}
 					}
 
 					// fazer o envio do nosso request
-					xhr.open('post', 'http://localhost:8080/api');
+					xhr.open('post', 'http://localhost:8080/api/postagens');
 					xhr.send(formData);
 
-				})
+				});
 
 			});
 		</script>
@@ -254,7 +254,7 @@
 		<nav class="navbar navbar-default py-0 my-0 border-bottom">
 			<div class="container py-2 my-0 px-0">
 				<div class="col-md-4 col-6 ml-0 mr-auto">
-					<a class="text-left" href="http://localhost/home">
+					<a class="text-left img-logo" href="http://localhost/home">
 						<img alt="Instagram" src="images/logo1.jpg" class="img-fluid ">
 					</a>
 				</div>

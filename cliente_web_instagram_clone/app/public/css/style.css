@@ -22,6 +22,10 @@ body{
 	height: 40px;
 }
 
+.img-logo:hover {
+	filter: opacity(0.8);
+}
+
 .logo2{
 	padding-left:50px;
 }
@@ -86,7 +90,7 @@ body{
 	font-weight: 600;
 }
 
-.btn_remover_postagem{
+.btn_remover_comentario{
 	outline: none !important;
 	outline-style: none !important;
 	box-shadow: none !important;
@@ -96,7 +100,7 @@ body{
 	text-decoration: none;
 	color: #d9534f;
 }
-.btn_remover_postagem:hover{
+.btn_remover_comentario:hover{
 	color: #963b38;
 }
 
