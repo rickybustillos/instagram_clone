@@ -2,9 +2,10 @@
 * versão 1.0.0
 
 Requisitos:
-node.js
-mongodb
-nodemon
+NodeJS
+MongoDB
+Nodemon
+ExpressJS
 
 Instalação:
 1. cd ./api
