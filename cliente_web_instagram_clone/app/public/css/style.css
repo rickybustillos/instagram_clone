@@ -54,20 +54,22 @@ body{
 	text-align: left;
 }
 
-.input_comentario{
+.btn-link {
+	border: none;
+	text-decoration: none;
+}
+.btn-link:hover, .btn-link:active, .btn-link:visited {
+	border: none;
+	text-decoration: none;
+}
+
+.remover-bordas {
 	outline: none !important;
 	outline-style: none !important;
 	box-shadow: none !important;
 	border-color: transparent !important;
 	border: none;
 	box-shadow: none;
-}
-.btn-link {
-	border: none;
-}
-.btn-link:hover {
-	border: none;
-	text-decoration: none;
 }
 
 .comentarios{
@@ -85,7 +87,30 @@ body{
 }
 
 .btn_remover_postagem{
+	outline: none !important;
+	outline-style: none !important;
+	box-shadow: none !important;
+	border-color: transparent !important;
+	border: none;
+	box-shadow: none;
 	text-decoration: none;
-	color: #c2c2c2;
-	border:none;
+	color: #d9534f;
+}
+.btn_remover_postagem:hover{
+	color: #963b38;
+}
+
+.btn-default {
+	text-decoration: none;
+	border: none;
+}
+
+.close {
+	font-size: 1rem ;
+	outline: none !important;
+	outline-style: none !important;
+	box-shadow: none !important;
+	border-color: transparent !important;
+	border: none;
+	box-shadow: none;
 }

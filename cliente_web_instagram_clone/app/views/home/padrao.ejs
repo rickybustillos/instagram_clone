@@ -3,7 +3,9 @@
 	<head>
 		<meta charset="UTF-8">
 
-		<title>Instagram Clone - WEB</title>
+		<link rel="shortcut icon" href="images/icon_insta.png" />
+
+		<title>Instagram</title>
 		
 		<!-- JQuery -->
 		<script src="http://code.jquery.com/jquery-3.1.1.min.js"></script>
@@ -13,6 +15,10 @@
 	
 		<!-- incluindo css -->
 		<link href="css/style.css" rel="stylesheet">
+
+		<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+		<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
 
 		<script>
 			$(document).ready(function(){
@@ -57,10 +63,10 @@
 										'</div>' +
 										'<div class="comentar row px-4 my-2">' +
 											'<div class="col-sm-8">' +
-												'<input type="text" class="form-control px-0 input_comentario" id="'+data[i]._id+'" placeholder="Adicione um comentário...">' +
+												'<input type="text" class="form-control px-0 input_comentario remover-bordas" id="'+data[i]._id+'" placeholder="Adicione um comentário...">' +
 											'</div>' +
 											'<div class="col-sm-4 text-right">' +
-												'<button class="btn btn-link btn_postagem btn-sm font-weight-bold" value="'+data[i]._id+'" type="button">Publicar</button>' +
+												'<button class="btn btn-link btn_postagem btn-sm font-weight-bold" value="'+data[i]._id+'" type="button" disabled>Publicar</button>' +
 											'</div>' +
 										'</div>' +
 									'</div>'					
@@ -72,16 +78,65 @@
 									for(let j = 0; j < comentarios.length; j++){
 
 										$('#comentarios_'+data[i]._id).append(
-											'<p class="txt-comentario font-weight-normal my-0 py-0">' + 
-												'<span class="font-weight-semibold">pessoa </span>' + 
-												comentarios[j].comentario +
-											'</p>'
+											'<div class="row txt-comentario font-weight-normal m-0 p-0" id="div_'+comentarios[j].id_comentario+'">' + 
+												'<div class="col-10 my-0 p-0">' + 
+													'<span class="font-weight-semibold">pessoa </span>' + 
+													comentarios[j].comentario + 
+												'</div>' +
+												'<div class="col-2 my-0 p-0">' + 
+													'<button type="button" class="btn btn-default text-dark my-0 py-0 font-weight-semibold remover_bordas align-top" data-toggle="modal" data-target="#modal_'+comentarios[j].id_comentario+'">. . .</button>' +
+
+													'<div class="modal fade" id="modal_'+comentarios[j].id_comentario+'" tabindex="-1" role="dialog" aria-labelledby="modal_'+comentarios[j].id_comentario+'Label" aria-hidden="true">' +
+														'<div class="modal-dialog modal-dialog-centered" role="document">'+
+															'<div class="modal-content">' +
+																'<div class="modal-body text-center">' +
+																	'<button class="btn btn-block btn_remover_postagem font-weight-semibold" type="button" value="'+comentarios[j].id_comentario +'" data-dismiss="modal">Excluir</button><hr>' +
+																	'<button class="btn btn-block btn-default close font-weight-semibold py-2" type="button" data-dismiss="modal" aria-label="Close">Cancelar</button>' +
+																'</div>' +
+															'</div>' +
+														'</div>' +
+													'</div>'+
+												'</div>' +
+											'</div>'
 										);
 
 									}
 								}
 
 							}
+
+							// verificação do comentário vazio
+							$('input.input_comentario').keyup(function(e){
+								var id = this.id;
+								if(this.value == ''){
+									if( !$(this).parent().parent().find('button').attr('disabled') ){
+										$(this).parent().parent().find('button').attr('disabled', 'disabled') 
+									}
+								} else {
+									$(this).parent().parent().find('button').removeAttr('disabled');
+								}
+							});
+
+
+							$('.btn_remover_postagem').click(function(){
+								var id_comentario = this.value;
+								
+								var xhr = new XMLHttpRequest();
+								xhr.open('DELETE', 'http://localhost:8080/api/'+id_comentario);
+								
+								xhr.onload = function(){
+									if(xhr.status === 200){
+										$('#modal_'+id_comentario).modal('hide');
+										$('div#div_'+id_comentario).remove();
+										$('div.modal-backdrop').remove();
+										$('body').removeClass('modal-open').removeAttr('style');
+									}
+								}
+
+								
+								xhr.send();
+								
+							});
 
 							$('.input_comentario').keypress(function(e){
 								if(e.wich == 13 || e.keyCode == 13){
@@ -102,21 +157,48 @@
 
 				}
 
+
 				function enviar_comentario(id){
 				
 					var comentario = $('#'+id).val();
 
 					var xhr = new XMLHttpRequest();
 					xhr.open('PUT', 'http://localhost:8080/api/'+id);
-					xhr.setRequestHeader('content-type', 'application/json');
-					xhr.send(JSON.stringify( {comentario : comentario} ));
-
+					xhr.setRequestHeader('Content-Type', 'application/json');
+					
 					xhr.onload = function(){
 						if(xhr.status === 200){
-							window.location.href = '/home';
+							let responseText = JSON.parse(xhr.responseText);
+							$('#comentarios_'+responseText.id_publicacao).append(
+								'<div class="row txt-comentario font-weight-normal m-0 p-0" id="div_'+responseText.id_comentario+'">' + 
+									'<div class="col-10 my-0 p-0">' + 
+										'<span class="font-weight-semibold">pessoa </span>' + 
+										responseText.comentario + 
+									'</div>' +
+									'<div class="col-2 my-0 p-0">' + 
+										'<button type="button" class="btn btn-default text-dark my-0 py-0 font-weight-semibold remover_bordas align-top" data-toggle="modal" data-target="#modal_'+responseText.id_comentario+'">. . .</button>' +
+	
+										'<div class="modal fade" id="modal_'+responseText.id_comentario+'" tabindex="-1" role="dialog" aria-labelledby="modal_'+responseText.id_comentario+'Label" aria-hidden="true">' +
+											'<div class="modal-dialog modal-dialog-centered" role="document">'+
+												'<div class="modal-content">' +
+													'<div class="modal-body text-center">' +
+														'<button class="btn btn-block btn_remover_postagem font-weight-semibold" type="button" value="'+responseText.id_comentario +'" data-dismiss="modal">Excluir</button><hr>' +
+														'<button class="btn btn-block btn-default close font-weight-semibold py-2" type="button" data-dismiss="modal" aria-label="Close">Cancelar</button>' +
+													'</div>' +
+												'</div>' +
+											'</div>' +
+										'</div>'+
+									'</div>' +
+								'</div>'
+							);
+						}
+						if(xhr.status === 400){
+							$('#'+id).val(xhr.responseText.msg);
 						}
 					}
 					
+					xhr.send(JSON.stringify( {comentario : comentario} ));
+
 					$('#'+id).val('');
 
 				}
@@ -159,7 +241,6 @@
 					// fazer o envio do nosso request
 					xhr.open('post', 'http://localhost:8080/api');
 					xhr.send(formData);
-
 
 				})
 
@@ -217,5 +298,6 @@
 				<div id="mensagem"></div>
 			</div>
 		</div>
+
 	</body>
 </html>

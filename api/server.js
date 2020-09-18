@@ -1,5 +1,6 @@
 // Carregar módulos do express, body-parser e do mongodb
 var express = require('express'),
+    expressValidator = require('express-validator'),
     bodyParser = require('body-parser'),
     multiparty = require('connect-multiparty'),
     mongodb = require('mongodb'),
@@ -151,14 +152,27 @@ app.get('/api/:id', function(req, res) {
 // PUT by ID (update)
 app.put('/api/:id', function(req, res) {
 
+    var comentario = req.body.comentario;
+
+    // Remove whitespaces
+    comentario = comentario.trim();
+
+    // Verificar se existe string
+    if(comentario == ''){
+        res.status(400).json({ msg: 'Comentário inválido.'});
+        return;
+    }
+
+    var id_comentario = new objectId();
+    
     db.open(function(err, mongoclient) {
         mongoclient.collection('postagens', function(err, collection) {
             collection.update(
                 { _id: objectId(req.params.id) },
                 { $push:    { 
                                 comentarios : {
-                                    id_comentario : new objectId(),
-                                    comentario : req.body.comentario
+                                    id_comentario : id_comentario,
+                                    comentario : comentario
                                 }
                             }
                 },
@@ -167,7 +181,7 @@ app.put('/api/:id', function(req, res) {
                     if (err) {
                         res.json(err);
                     } else {
-                        res.json(records);
+                        res.status(200).json({resultados : records, id_publicacao : req.params.id, id_comentario : id_comentario, comentario : comentario});
                     }
                     mongoclient.close();
                 }
@@ -179,16 +193,21 @@ app.put('/api/:id', function(req, res) {
 
 // DELETE by ID (remover)
 app.delete('/api/:id', function(req, res) {
+
     db.open(function(err, mongoclient) {
         mongoclient.collection('postagens', function(err, collection) {
-            collection.remove({ _id: objectId(req.params.id) }, function(err, records) {
-                if (err) {
-                    res.json(err);
-                } else {
-                    res.json(records);
-                }
-                mongoclient.close();
-            });
+            collection.update( 
+                {},
+                { $pull : { comentarios: { id_comentario : objectId(req.params.id) } } },
+                { multi:true },
+                function(err, records) {
+                    if (err) {
+                        res.json(err);
+                    } else {
+                        res.json(records);
+                    }
+                    mongoclient.close();                
+                });
         });
     });
 });
